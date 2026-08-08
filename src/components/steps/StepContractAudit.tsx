@@ -12,9 +12,10 @@ interface StepContractAuditProps {
 export function StepContractAudit({ onNext }: StepContractAuditProps) {
   const {
     sessionId,
-    provider,     // NEW: Pulled from store
-    modelName,    // NEW: Pulled from store
-    apiKey,       // NEW: Pulled from store
+    provider,
+    modelName,
+    apiKey,
+    embeddingApiKey,
     contractFile,
     setContractFile,
     setReviewQueue,
@@ -39,12 +40,12 @@ export function StepContractAudit({ onNext }: StepContractAuditProps) {
     setError(null);
 
     try {
-      // FIX: Pass all 5 required arguments to match api.ts
       const response = await ClauseGuardAPI.auditContract(
         sessionId,
         provider,
         modelName,
         apiKey,
+        embeddingApiKey,
         contractFile
       );
       

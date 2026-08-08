@@ -9,8 +9,16 @@ interface StepPolicyKBProps {
 }
 
 export function StepPolicyKB({ onNext }: StepPolicyKBProps) {
-  const { sessionId, policies, addPolicy, removePolicy, setIsLoading, setError, isLoading } =
-    useClauseGuardStore();
+  const {
+    sessionId,
+    embeddingApiKey,
+    policies,
+    addPolicy,
+    removePolicy,
+    setIsLoading,
+    setError,
+    isLoading,
+  } = useClauseGuardStore();
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -21,11 +29,19 @@ export function StepPolicyKB({ onNext }: StepPolicyKBProps) {
   const handleNext = async () => {
     if (policies.length === 0) return;
 
+    // embeddingApiKey is set on the previous step (StepConfiguration), but
+    // guard here too in case someone navigates back and clears it, or a
+    // future step ordering change lets this be reached without it set.
+    if (!embeddingApiKey) {
+      setError("Missing embedding API key. Please go back and enter your OpenAI API key.");
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
-      await ClauseGuardAPI.uploadPolicies(sessionId, policies);
+      await ClauseGuardAPI.uploadPolicies(sessionId, policies, embeddingApiKey);
       setIsLoading(false);
       onNext();
     } catch (err) {

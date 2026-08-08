@@ -7,6 +7,7 @@ interface ClauseGuardStore {
   provider: Provider;
   modelName: string;
   apiKey: string;
+  embeddingApiKey: string; // Separate OpenAI key used only for embeddings (policy ingest + retrieval), independent of the LLM provider/key chosen above
   policies: File[];
   contractFile: File | null;
   reviewQueue: ReviewItem[];
@@ -20,6 +21,7 @@ interface ClauseGuardStore {
   setProvider: (provider: Provider) => void;
   setModelName: (name: string) => void;
   setApiKey: (key: string) => void;
+  setEmbeddingApiKey: (key: string) => void;
   setPolicies: (files: File[]) => void;
   addPolicy: (file: File) => void;
   removePolicy: (index: number) => void;
@@ -38,6 +40,7 @@ const initialState = {
   provider: "Groq" as Provider,
   modelName: "",
   apiKey: "",
+  embeddingApiKey: "",
   policies: [] as File[],
   contractFile: null as File | null,
   reviewQueue: [] as ReviewItem[],
@@ -54,6 +57,7 @@ export const useClauseGuardStore = create<ClauseGuardStore>((set) => ({
   setProvider: (provider) => set({ provider }),
   setModelName: (name) => set({ modelName: name }),
   setApiKey: (key) => set({ apiKey: key }),
+  setEmbeddingApiKey: (key) => set({ embeddingApiKey: key }),
   setPolicies: (files) => set({ policies: files }),
   addPolicy: (file) => set((state) => ({ policies: [...state.policies, file] })),
   removePolicy: (index) =>

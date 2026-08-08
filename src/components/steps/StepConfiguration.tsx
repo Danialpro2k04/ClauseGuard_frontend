@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useClauseGuardStore } from "@/lib/store";
 import { Provider } from "@/lib/types";
 import { motion } from "framer-motion";
-import { Zap, Key } from "lucide-react";
+import { Zap, Key, Sparkles } from "lucide-react";
 
 interface StepConfigurationProps {
   onNext: () => void;
@@ -67,7 +67,10 @@ export function StepConfiguration({ onNext }: StepConfigurationProps) {
   const store = useClauseGuardStore();
   const selectedProvider = store.provider;
   const availableModels = MODELS[selectedProvider];
-  const isComplete = store.modelName && store.apiKey;
+  // Embedding key is required too now, regardless of which LLM provider is
+  // chosen above, since retrieval always calls OpenAI's embeddings API on
+  // the backend.
+  const isComplete = store.modelName && store.apiKey && store.embeddingApiKey;
 
   const handleProviderChange = (newProvider: Provider) => {
     store.setProvider(newProvider);
@@ -151,6 +154,34 @@ export function StepConfiguration({ onNext }: StepConfigurationProps) {
         />
         <p className="text-xs text-zinc-500">
           Your API key is never stored or shared. Used only during this session.
+        </p>
+      </div>
+
+      {/* Embedding API Key Input */}
+      <div className="space-y-4">
+        <label htmlFor="embeddingApiKey" className="block text-sm font-bold text-zinc-900">
+          <Sparkles className="inline w-4 h-4 mr-2" />
+          Embedding API Key (Cohere)
+        </label>
+        <input
+          id="embeddingApiKey"
+          type="password"
+          value={store.embeddingApiKey}
+          onChange={(e) => store.setEmbeddingApiKey(e.target.value)}
+          placeholder="Enter your Cohere API key..."
+          className="w-full px-4 py-3 rounded-2xl border-2 border-zinc-200 bg-zinc-50 text-zinc-900 placeholder-zinc-400 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-zinc-300 transition-colors"
+        />
+        <p className="text-xs text-zinc-500">
+          Used to convert your policy documents and contract clauses into searchable embeddings — this step is separate from the LLM you configured above. Cohere gives every account a free key with 1,000 calls/month, no credit card required.{" "}
+          <a
+            href="https://dashboard.cohere.com/api-keys"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-700 font-semibold underline underline-offset-2"
+          >
+            Get a free key at dashboard.cohere.com
+          </a>
+          . Never stored or shared beyond this session.
         </p>
       </div>
 
